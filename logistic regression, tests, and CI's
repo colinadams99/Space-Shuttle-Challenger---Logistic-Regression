@@ -1,0 +1,74 @@
+The data conained in challenger.csv are the launch temperatures (degrees Farenheit) and an indicator of O-ring failures for 24 space shuttle launches prior to the space shuttle Challenger disaster of January 28, 1986.
+
+```{r}
+# import dataset
+challenger <- read_csv('C://Users/cgada/OneDrive/Documents/datasets/challenger.csv')
+
+head(challenger)
+```
+
+## Fitting the logistic regression of Failure (1 for failure) on Temperaure, and reporting the estimated coefficients and their standard errors.
+
+```{r}
+# converting failure into binary
+challenger$Failure <- if_else(challenger$Failure == 'Yes', 1, 0)
+
+# creating logistic regression model
+challengerglm <- glm(Failure ~ Temperature, data = challenger, family = binomial)
+
+# summary of model
+challengerglm %>% summary() %>% pander()
+
+```
+
+The estimated coefficients and their corresponding standard errors can be located in the summary table above.
+
+Testing whether the coefficient of Temperature is 0, using Walds test, and reporting a one-sided p-value (the alternative hypothesis is that the coefficient is negative; odds of failure decrease with increasing temperature).
+
+```{r}
+# betahat established
+betahat <- coef(challengerglm)
+
+# wald test
+wald.test(Sigma = vcov(challengerglm), b = betahat, Terms = 2)
+
+```
+
+* P-value = 0.04
+
+## Now testing whether the coefficient of Temperature is 0, using the drop-in-deviance test.
+
+```{r}
+# first making null
+challengerlogitnull <- glm(Failure ~ 1, data = challenger, family = binomial)
+
+# anova
+anova(challengerlogitnull, challengerglm, test = "LRT")
+
+```
+
+The outcome of our likelihood ratio tests suggests that the coefficient of Temperature is statistically different from 0.
+
+## 95% confidence interval for the coefficient of Temperature.
+
+``{r}
+# default CI function
+CI_95 <- confint.default(challengerglm)
+CI_95 %>% summary() %>% pander()
+```
+
+## Estimated logit of failure probability at 31 degrees, and estimated probability of failure?
+
+```{r}
+# logit
+challengerlogit <- glm(Failure ~ Temperature, data = challenger, family = binomial)
+
+# prediction
+predict(challengerlogit, newdata = data.frame(Temperature = 31), type = "response")
+```
+
+The probability of failure at 31 degrees Fahrenheit is **99.62%**. This means that they probably should not have launched. Politics...
+
+This answer must be treated cautiously because lives are at stake, tax-payers dollars are at stake, and jobs are at stake. The launch should not have been rushed simply because it was already pushed back and they wanted to keep to a schedule. If there is a chance of failure like that, it should not be taken.
+
+
