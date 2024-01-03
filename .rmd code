@@ -67,7 +67,7 @@ challengerlogit <- glm(Failure ~ Temperature, data = challenger, family = binomi
 predict(challengerlogit, newdata = data.frame(Temperature = 31), type = "response")
 ```
 
-The probability of failure at 31 degrees Fahrenheit is **99.62%**. This means that they probably should not have launched. Politics...
+The probability of failure at 31 degrees Fahrenheit (the temperature at which Challenger was actually launched at) is **99.62%**. This means that they probably should not have launched. Politics...
 
 This answer must be treated cautiously because lives are at stake, tax-payers dollars are at stake, and jobs are at stake. The launch should not have been rushed simply because it was already pushed back and they wanted to keep to a schedule. If there is a chance of failure like that, it should not be taken.
 
